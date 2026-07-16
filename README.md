@@ -96,21 +96,24 @@ Comportement actuel :
 
 ## Architecture
 
-Le projet suit maintenant une séparation plus nette des responsabilités.
+L'architecture a ete simplifiee pour rester facile a comprendre tout en gardant un minimum de decouplage.
+
+Flux principal :
+
+`ChatScreen -> ChatController -> ChatService -> AiChatClient -> Gemini/Groq`
 
 ### Présentation
 
 - [lib/presentation/screens/chat_screen.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/presentation/screens/chat_screen.dart:1) : écran Flutter et rendu UI
 - [lib/presentation/controllers/chat_controller.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/presentation/controllers/chat_controller.dart:1) : état de la conversation et orchestration côté présentation
 
-### Domaine
+### Contrat
 
-- [lib/domain/contracts/chat_gateway.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/domain/contracts/chat_gateway.dart:1) : contrat d'accès au chat
-- [lib/domain/contracts/ai_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/domain/contracts/ai_chat_client.dart:1) : contrat pour un client fournisseur
+- [lib/domain/contracts/ai_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/domain/contracts/ai_chat_client.dart:1) : contrat simple pour ajouter un nouveau fournisseur sans modifier le reste de l'application
 
 ### Data
 
-- [lib/data/services/chat_service.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/services/chat_service.dart:1) : composition des fournisseurs via les interfaces
+- [lib/data/services/chat_service.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/services/chat_service.dart:1) : selectionne le bon fournisseur a partir du contrat `AiChatClient`
 - [lib/data/clients/gemini_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/clients/gemini_chat_client.dart:1) : implémentation Gemini
 - [lib/data/clients/groq_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/clients/groq_chat_client.dart:1) : implémentation Groq
 
@@ -123,10 +126,9 @@ Le projet suit maintenant une séparation plus nette des responsabilités.
 ## Principes appliqués
 
 - `Single Responsibility` : chaque couche a un rôle clair
-- `Dependency Inversion` : l'écran dépend d'un contrôleur, le contrôleur dépend d'un contrat
-- `Open/Closed` : un nouveau fournisseur peut être ajouté en implémentant `AiChatClient`
+- `Open/Closed` : un nouveau fournisseur peut etre ajoute en implementant `AiChatClient`
 - couplage réduit entre UI et code réseau
-- testabilité améliorée grâce aux interfaces
+- testabilité améliorée grace au contrat du provider
 
 ## Tests et qualité
 

@@ -1,15 +1,15 @@
 import 'package:chat_ai_gemini/core/ai_provider.dart';
-import 'package:chat_ai_gemini/domain/contracts/chat_gateway.dart';
+import 'package:chat_ai_gemini/data/services/chat_service.dart';
 import 'package:chat_ai_gemini/models/chat_message.dart';
 import 'package:flutter/foundation.dart';
 
 class ChatController extends ChangeNotifier {
   ChatController({
-    required this.chatGateway,
+    required this.chatService,
     AiProvider initialProvider = AiProvider.gemini,
   }) : _selectedProvider = initialProvider;
 
-  final ChatGateway chatGateway;
+  final ChatService chatService;
   final List<ChatMessage> _messages = [];
 
   AiProvider _selectedProvider;
@@ -20,7 +20,7 @@ class ChatController extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> initialize() {
-    return chatGateway.resetConversation(_selectedProvider);
+    return chatService.resetConversation(_selectedProvider);
   }
 
   Future<void> changeProvider(AiProvider? provider) async {
@@ -32,13 +32,13 @@ class ChatController extends ChangeNotifier {
     _messages.clear();
     notifyListeners();
 
-    await chatGateway.resetConversation(provider);
+    await chatService.resetConversation(provider);
   }
 
   Future<void> clearConversation() async {
     _messages.clear();
     notifyListeners();
-    await chatGateway.resetConversation(_selectedProvider);
+    await chatService.resetConversation(_selectedProvider);
   }
 
   Future<void> sendMessage(String rawMessage) async {
@@ -52,7 +52,7 @@ class ChatController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await chatGateway.getChatResponse(
+    final response = await chatService.getChatResponse(
       provider: _selectedProvider,
       userMessage: userMessage,
       history: history,

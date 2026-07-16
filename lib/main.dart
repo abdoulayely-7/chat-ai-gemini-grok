@@ -16,7 +16,7 @@ Future<void> main() async {
   }
 
   final controller = ChatController(
-    chatGateway: ChatService(
+    chatService: ChatService(
       clients: [
         GeminiChatClient(
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? dotenv.env['API_KEY'] ?? '',

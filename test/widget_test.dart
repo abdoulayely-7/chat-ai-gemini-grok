@@ -1,5 +1,6 @@
 import 'package:chat_ai_gemini/core/ai_provider.dart';
-import 'package:chat_ai_gemini/domain/contracts/chat_gateway.dart';
+import 'package:chat_ai_gemini/data/services/chat_service.dart';
+import 'package:chat_ai_gemini/domain/contracts/ai_chat_client.dart';
 import 'package:chat_ai_gemini/main.dart';
 import 'package:chat_ai_gemini/models/chat_message.dart';
 import 'package:chat_ai_gemini/presentation/controllers/chat_controller.dart';
@@ -10,7 +11,9 @@ void main() {
   testWidgets('displays sent and received messages', (
     WidgetTester tester,
   ) async {
-    final controller = ChatController(chatGateway: _FakeChatGateway());
+    final controller = ChatController(
+      chatService: ChatService(clients: [_FakeChatClient()]),
+    );
 
     await tester.pumpWidget(MyApp(controller: controller));
     await tester.pump();
@@ -25,16 +28,18 @@ void main() {
   });
 }
 
-class _FakeChatGateway implements ChatGateway {
+class _FakeChatClient implements AiChatClient {
   @override
-  Future<String> getChatResponse({
-    required AiProvider provider,
+  AiProvider get provider => AiProvider.gemini;
+
+  @override
+  Future<void> resetConversation() async {}
+
+  @override
+  Future<String> sendMessage({
     required String userMessage,
     List<ChatMessage> history = const [],
   }) async {
     return 'Reponse: $userMessage';
   }
-
-  @override
-  Future<void> resetConversation(AiProvider provider) async {}
 }
