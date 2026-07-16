@@ -1,4 +1,8 @@
-import 'package:chat_ai_gemini/Screens/chat_screen.dart';
+import 'package:chat_ai_gemini/data/clients/gemini_chat_client.dart';
+import 'package:chat_ai_gemini/data/clients/groq_chat_client.dart';
+import 'package:chat_ai_gemini/data/services/chat_service.dart';
+import 'package:chat_ai_gemini/presentation/controllers/chat_controller.dart';
+import 'package:chat_ai_gemini/presentation/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -11,26 +15,31 @@ Future<void> main() async {
     debugPrint('Impossible de charger .env: $e');
   }
 
-  final groqApiKey = dotenv.env['GROQ_API_KEY'];
-  debugPrint(
-    groqApiKey == null || groqApiKey.isEmpty
-        ? 'GROQ_API_KEY non chargee.'
-        : 'GROQ_API_KEY chargee: ${groqApiKey.substring(0, groqApiKey.length.clamp(0, 12))}...',
+  final controller = ChatController(
+    chatGateway: ChatService(
+      clients: [
+        GeminiChatClient(
+          apiKey: dotenv.env['GEMINI_API_KEY'] ?? dotenv.env['API_KEY'] ?? '',
+        ),
+        GroqChatClient(apiKey: dotenv.env['GROQ_API_KEY'] ?? ''),
+      ],
+    ),
   );
 
-  runApp(const MyApp());
+  runApp(MyApp(controller: controller));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({required this.controller, super.key});
 
-  // This widget is the root of your application.
+  final ChatController controller;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Chat IA',
-      home: const ChatScreen(),
+      home: ChatScreen(controller: controller),
     );
   }
 }

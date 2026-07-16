@@ -1,53 +1,31 @@
 # chat_ai_gemini
 
-Application Flutter de conversation avec plusieurs fournisseurs d'IA.  
-Le projet permet actuellement de discuter avec `Gemini` et `Groq` depuis une seule interface mobile.
+Application Flutter de chat multi-IA avec support de `Gemini` et `Groq`.
 
-## Aperçu
+Le projet a été refactoré pour réduire le couplage entre l'interface, la logique métier et les intégrations externes. L'objectif est d'avoir une base plus propre, plus testable et plus facile à faire évoluer.
 
-Cette application propose :
+## Fonctionnalités
 
-- une interface de chat simple en Flutter
-- un changement rapide de fournisseur IA depuis la barre du haut
-- la conservation de l'historique de la conversation pendant la session
-- la suppression de l'historique avec un bouton dédié
-- le chargement sécurisé des clés API via un fichier `.env`
-- des logs de diagnostic pour faciliter le débogage de l'intégration Groq
+- conversation avec `Gemini` ou `Groq` depuis un seul écran
+- changement de fournisseur à chaud via la barre d'action
+- réinitialisation de la conversation en un clic
+- chargement des clés API depuis un fichier `.env`
+- architecture découpée en couches avec responsabilités séparées
 
-## Technologies utilisées
+## Stack technique
 
 - `Flutter`
 - `Dart`
 - `google_generative_ai` pour Gemini
-- `flutter_dotenv` pour charger les variables d'environnement
-- `dart:io` pour les appels HTTP vers l'API Groq
-
-## Fournisseurs pris en charge
-
-### Gemini
-
-L'application utilise le SDK `google_generative_ai` avec le modèle :
-
-- `gemini-1.5-flash-latest`
-
-### Groq
-
-L'application utilise l'endpoint compatible OpenAI de Groq :
-
-- `https://api.groq.com/openai/v1/chat/completions`
-
-avec le modèle :
-
-- `llama-3.3-70b-versatile`
+- `flutter_dotenv` pour les variables d'environnement
+- `dart:io` pour l'appel HTTP vers Groq
 
 ## Prérequis
 
-Avant de lancer le projet, assure-toi d'avoir :
-
 - `Flutter` installé et configuré
-- un appareil Android, iOS, ou un émulateur
-- une clé API Gemini si tu veux utiliser Gemini
-- une clé API Groq si tu veux utiliser Groq
+- un émulateur ou un appareil physique
+- une clé API Gemini pour utiliser Gemini
+- une clé API Groq pour utiliser Groq
 
 Vérification rapide :
 
@@ -57,10 +35,6 @@ flutter --version
 
 ## Installation
 
-1. Clone le projet.
-2. Place-toi dans le dossier du projet.
-3. Installe les dépendances Flutter.
-
 ```bash
 git clone <url-du-repo>
 cd chat_ai_gemini
@@ -69,7 +43,7 @@ flutter pub get
 
 ## Configuration
 
-Crée un fichier `.env` à la racine du projet.
+Crée ou complète le fichier `.env` à la racine du projet.
 
 Exemple :
 
@@ -78,137 +52,117 @@ GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 ```
 
-Un fichier d'exemple est déjà fourni :
-
-- [.env.example](/home/lydevtech/Projects/mobile/chat_ai_gemini/.env.example:1)
-
-### Compatibilité existante
-
-Le projet accepte encore :
+Alias encore accepté pour Gemini :
 
 ```env
 API_KEY=your_gemini_api_key
 ```
 
-comme alias de `GEMINI_API_KEY`.
+Un exemple est disponible ici :
 
-### Important
+- [.env.example](/home/lydevtech/Projects/mobile/chat_ai_gemini/.env.example:1)
 
-- Le fichier `.env` est embarqué comme asset Flutter pour être lisible dans l'application.
-- Le fichier `.env` est ignoré par Git, donc tes secrets locaux ne sont pas versionnés.
-- Évite d'écrire ou de partager tes clés API dans le code source.
+Notes :
+
+- le fichier `.env` est chargé au démarrage par l'application
+- le fichier `.env` est déclaré dans les assets Flutter
+- ne versionne pas tes vraies clés API
 
 ## Lancement
-
-### En mode développement
 
 ```bash
 flutter run
 ```
 
-### Si tu modifies `pubspec.yaml`
-
-Relance :
+Si `pubspec.yaml` change :
 
 ```bash
 flutter pub get
 ```
-
-avant `flutter run`.
 
 ## Utilisation
 
 1. Lance l'application.
-2. Choisis `Gemini` ou `Groq` dans la liste déroulante en haut.
-3. Saisis ton message.
+2. Choisis `Gemini` ou `Groq` dans la liste en haut.
+3. Saisis un message.
 4. Appuie sur l'icône d'envoi.
-5. Utilise l'icône corbeille pour réinitialiser la conversation.
+5. Utilise l'icône corbeille pour effacer la conversation courante.
 
-### Comportement actuel
+Comportement actuel :
 
-- Changer de fournisseur vide l'historique affiché.
-- Gemini garde une session de chat interne tant que tu restes sur ce fournisseur.
-- Groq reconstruit le contexte à partir des messages déjà présents dans l'écran.
+- le changement de fournisseur vide la conversation affichée
+- Gemini conserve une session de chat interne tant que ce fournisseur reste actif
+- Groq reconstruit le contexte à partir de l'historique affiché
 
-## Débogage
+## Architecture
 
-L'application affiche des logs utiles au démarrage et pendant les appels Groq.
+Le projet suit maintenant une séparation plus nette des responsabilités.
 
-### Vérifier que la clé Groq est chargée
+### Présentation
 
-Au lancement, la console peut afficher :
+- [lib/presentation/screens/chat_screen.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/presentation/screens/chat_screen.dart:1) : écran Flutter et rendu UI
+- [lib/presentation/controllers/chat_controller.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/presentation/controllers/chat_controller.dart:1) : état de la conversation et orchestration côté présentation
 
-- `GROQ_API_KEY chargee: ...`
-- `GROQ_API_KEY non chargee.`
+### Domaine
 
-Si la clé n'est pas chargée :
+- [lib/domain/contracts/chat_gateway.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/domain/contracts/chat_gateway.dart:1) : contrat d'accès au chat
+- [lib/domain/contracts/ai_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/domain/contracts/ai_chat_client.dart:1) : contrat pour un client fournisseur
 
-- vérifie que le fichier `.env` existe à la racine
-- vérifie que `GROQ_API_KEY` est bien renseignée
-- vérifie qu'il n'y a pas d'espace avant ou après la clé
+### Data
 
-### Vérifier la réponse Groq
+- [lib/data/services/chat_service.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/services/chat_service.dart:1) : composition des fournisseurs via les interfaces
+- [lib/data/clients/gemini_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/clients/gemini_chat_client.dart:1) : implémentation Gemini
+- [lib/data/clients/groq_chat_client.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/data/clients/groq_chat_client.dart:1) : implémentation Groq
 
-Pendant une requête Groq, la console affiche :
+### Noyau et modèles
 
-- le code HTTP
-- la réponse brute de l'API
-- l'exception éventuelle
+- [lib/core/ai_provider.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/core/ai_provider.dart:1) : enum des fournisseurs et labels
+- [lib/models/chat_message.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/models/chat_message.dart:1) : modèle de message
+- [lib/main.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/main.dart:1) : bootstrap et injection des dépendances
 
-Exemples fréquents :
+## Principes appliqués
 
-- `401` : clé API invalide
-- `400` : requête invalide ou payload incorrect
-- `404` : modèle ou endpoint incorrect
+- `Single Responsibility` : chaque couche a un rôle clair
+- `Dependency Inversion` : l'écran dépend d'un contrôleur, le contrôleur dépend d'un contrat
+- `Open/Closed` : un nouveau fournisseur peut être ajouté en implémentant `AiChatClient`
+- couplage réduit entre UI et code réseau
+- testabilité améliorée grâce aux interfaces
 
-## Structure du projet
+## Tests et qualité
 
-Les fichiers principaux sont :
+Commandes utiles :
 
-- [lib/main.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/main.dart:1) : point d'entrée et chargement du `.env`
-- [lib/Screens/chat_screen.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/Screens/chat_screen.dart:1) : interface de chat
-- [lib/Services/api_service.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/Services/api_service.dart:1) : intégration Gemini et Groq
-- [lib/Models/Message.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/lib/Models/Message.dart:1) : modèle de message
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
 
-## Dépendances principales
+Le test principal actuel vérifie l'envoi et l'affichage d'une réponse simulée :
 
-Extrait de [pubspec.yaml](/home/lydevtech/Projects/mobile/chat_ai_gemini/pubspec.yaml:1) :
-
-- `google_generative_ai`
-- `flutter_dotenv`
-- `flutter_tts`
+- [test/widget_test.dart](/home/lydevtech/Projects/mobile/chat_ai_gemini/test/widget_test.dart:1)
 
 ## Limitations actuelles
 
-- le nom du projet mentionne encore `gemini` alors que l'application gère aussi `Groq`
-- `flutter_tts` est présent dans les dépendances mais n'est pas activement utilisé dans l'écran de chat
-- le fichier `lib/Models/Message.dart` ne suit pas encore la convention `lower_case_with_underscores`
-- le modèle Groq configuré est un modèle payant côté API
+- l'historique n'est pas persisté localement
+- aucun streaming de réponse n'est encore implémenté
+- `flutter_tts` est présent dans les dépendances mais n'est pas utilisé
+- la gestion des erreurs reste textuelle, sans typage métier dédié
 
-## Améliorations possibles
+## Pistes d'amélioration
 
-- renommer le projet pour refléter le support multi-IA
-- ajouter un écran de paramètres
-- permettre de choisir le modèle Groq et le modèle Gemini dynamiquement
-- ajouter le streaming des réponses
-- activer la synthèse vocale
-- sauvegarder l'historique localement
-- améliorer l'UI du chat
-
-## Commandes utiles
-
-```bash
-flutter pub get
-flutter run
-dart analyze
-dart format lib
-```
+- ajouter une vraie injection de dépendances centralisée
+- introduire des objets d'erreur métier plutôt que des chaînes
+- permettre la sélection dynamique des modèles
+- persister l'historique localement
+- ajouter des tests unitaires sur le contrôleur et les clients
+- améliorer le thème et les composants UI
 
 ## Sécurité
 
-- Ne versionne jamais ton vrai fichier `.env`.
-- Si une clé a déjà été partagée publiquement, régénère-la depuis ton fournisseur.
-- Préfère des variables d'environnement locales pour tous les secrets.
+- ne versionne jamais ton vrai fichier `.env`
+- régénère toute clé exposée publiquement
+- limite les permissions et quotas côté fournisseurs si possible
 
 ## Licence
 
