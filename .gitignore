@@ -106,6 +106,7 @@ DerivedData/
 
 # Local config
 /local.properties
+.env
 
 # Exclude JetBrains IDE folders
 .idea/
