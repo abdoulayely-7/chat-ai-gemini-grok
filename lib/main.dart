@@ -4,7 +4,20 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('Impossible de charger .env: $e');
+  }
+
+  final groqApiKey = dotenv.env['GROQ_API_KEY'];
+  debugPrint(
+    groqApiKey == null || groqApiKey.isEmpty
+        ? 'GROQ_API_KEY non chargee.'
+        : 'GROQ_API_KEY chargee: ${groqApiKey.substring(0, groqApiKey.length.clamp(0, 12))}...',
+  );
+
   runApp(const MyApp());
 }
 
@@ -16,8 +29,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Chat avec Gemini',
-      home:  ChatScreen(),
+      title: 'Chat IA',
+      home: const ChatScreen(),
     );
   }
 }
