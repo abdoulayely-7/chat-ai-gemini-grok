@@ -1,0 +1,114 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/ios/Flutter/.last_build_id
+**/doc/api/
+
+.env
+
+# Visual Studio Code
+.vscode/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Android
+/android/.gradle/
+/android/app/build/
+/android/build/
+**/local.properties
+**/gradle-wrapper.jar
+**/gradle-wrapper.properties
+**/gradle-wrapper.lock
+**/gradle-wrapper.log
+**/gradle/gradle.properties
+**/gradlew
+**/gradlew.bat
+**/gradle/wrapper/
+
+# iOS
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/ServiceDefinitions.json
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner/GeneratedPluginRegistrant
+ios/Flutter/*.symlinks
+ios/Flutter/flutter_export_environment.sh
+Pods/
+Podfile.lock
+
+# Xcode
+*.xcuserdata
+*.xccheckout
+*.xcscmblueprint
+*.xcodeproj/project.xcworkspace/
+*.xcworkspace
+*.xcuserstate
+*.moved-aside
+DerivedData/
+
+# macOS
+/macos/Flutter/GeneratedPluginRegistrant.swift
+/macos/Flutter/Flutter.framework
+/macos/Flutter/Flutter.podspec
+/macos/Flutter/ephemeral/
+/macos/Runner/GeneratedPluginRegistrant.*
+
+# Linux
+/linux/flutter/ephemeral/
+/linux/flutter/generated_plugin_registrant.cc
+/linux/flutter/generated_plugin_registrant.h
+
+# Windows
+/windows/flutter/ephemeral/
+/windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugin_registrant.h
+
+# Web
+/web/.dart_tool/
+/web/manifest.json
+/web/firebase-debug.log
+
+# Build outputs
+**/build/
+**/out/
+
+# Generated files
+*.lock
+*.log
+*.tmp
+*.temp
+*.class
+*.pyc
+*.swp
+
+# Misc
+.DS_Store
+*.iml
+*.ipr
+*.iws
+.idea/
+*.keystore
+
+# Firebase
+/firebase_app_id_file.json
+
+# Local config
+/local.properties
+
+# Exclude JetBrains IDE folders
+.idea/
+
+# Avoid committing generated iOS and Android plugin symlinks
+**/*.symlinks
